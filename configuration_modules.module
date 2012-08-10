@@ -1,0 +1,172 @@
+<?php
+//global $variables;
+/**
+ * Implements hook_configuration_api().
+ */
+function configuration_modules_configuration_api() {
+  return array(
+    'configuration_modules' => array(
+      'name' => t('System Modules'),
+      'feature_source' => FALSE,
+      'default_hook' => 'configuration_modules_configuration_export_options',
+      'default_file' => CONFIGURATION_DEFAULTS_CUSTOM,
+      'default_filename' => 'configuration.modules',
+    ),
+  );
+}
+
+
+/**
+ * Implements hook_configuration_export_options().
+ */
+function configuration_modules_configuration_export_options() {
+  $options = array();
+  $module_list = module_list(TRUE, FALSE, TRUE);
+  foreach ($module_list as $module) {
+    $options[$module] = $module;
+  }
+  return $options;
+}
+
+/**
+ * Implements hook_configuration_export().
+ */
+function configuration_modules_configuration_export($data, &$export, $module_name = 'configuration_modules') {
+  $pipe = array();
+  $map = configuration_get_default_map('configuration_modules');
+  foreach ($data as $name) {
+    $export['dependencies']['configuration_modules'] = 'configuration_modules';
+    // If another module provides this style, add it as a dependency
+    if (isset($map[$name]) && $map[$name] != $module_name) {
+      $module = $map[$name];
+      $export['dependencies'][$module] = $module;
+    }
+    // Otherwise, export the style
+      $value = variable_get($name);
+      if ($value) {
+      $export['configuration']['configuration_modules'][$name] = $name;
+    }
+  }
+  return $pipe;
+}
+
+/**
+ * Implements hook_configuration_export_render().
+ */
+function configuration_modules_configuration_export_render($module_name, $data, $export = NULL) {
+  $code = array();
+  
+  $code[] = '  $modules = array();';
+  $code[] = '';
+  $module_list = module_list(TRUE, FALSE, TRUE);
+  foreach ($module_list as $module) {
+    if ($module) {
+      
+        $code[] = "  // Exported module: {$module}";
+        
+        $code[] = "  \$modules['{$module}'] = TRUE;";
+        
+        $code[] = "";
+        
+    }
+  }
+  $code[] = '  return $modules;';
+  $code = implode("\n", $code);
+  return array('configuration_modules_default_values' => $code);
+}
+
+/**
+ * Implements hook_configuration_revert().
+ */
+function configuration_modules_configuration_revert($identifiers, $module_name = 'configuration_modules') {
+  $default_modules = configuration_get_default('configuration_modules', $module_name);
+  if ($default_modules) {
+    foreach ($default_modules as $module) {
+      if (in_array($module, $identifiers) || $identifiers[0] == '#import_all') {
+        //variable_set($name,$value);
+      }
+    }
+  }
+}
+
+//There are no hooks available in Drupal 7 but in drupal  8 hook_variable_set will be used to trigger this function
+function configuration_check_configuration_modules($identifier) {
+//  // Get static variable that we can access across this request.
+//  $from_activestore = &drupal_static('configuration_from_activestore');
+//  
+//  if (file_exists("config://configuration.inc")) {
+//    // Load the current configuration file on disk
+//    include_once "config://configuration.inc";
+//    if (function_exists('configuration_modules_default_values')) {
+//      // Clear all caches and flush.
+//      // NOt sure if I should empty the vars here
+//
+//      // Export just the field we're tracking.
+//      module_load_include('inc', 'configuration', 'configuration.export');
+//
+//      // Export the field we just saved and evaluate the export to $fields
+//      eval(array_pop(configuration_modules_configuration_export_render('configuration_modules', array($identifier))));
+//
+//      $variables_code = configuration_modules_default_values();
+//      
+//      // If the activestore doesn't exist it is most likely because this configuration
+//      // only exists in code.
+//      if (empty($variables)) {
+//        configuration_set_status($component, $identifier, CONFIGURATION_TRACKED_DATASTORE_ONLY);
+//      }
+//
+//      // If this was the previous configuration in activestore don't mark this as changed.
+//      $config = configuration_get_configuration();
+//      /**
+//       * @todo This code is reused in all component files.
+//       */
+//      $return = '';
+//      $component = 'configuration_modules';
+//      $status = $config[$component][$identifier]['status'];
+//      $md5_datastore = (is_array($variables_code) && array_key_exists($identifier, $variables_code)) ? md5(serialize($variables_code[$identifier])) : '';
+//      $md5_activestore = md5(serialize($variables_code[$identifier]));
+//      
+//      // Configs in code are not the same as what was just saved in activestore.
+//      if ($from_activestore == TRUE && $md5_datastore != $md5_activestore) {
+//        $status = $status | CONFIGURATION_ACTIVESTORE_OVERRIDDEN;
+//        configuration_set_status($component, $identifier, $status);
+//      }
+//      // Menu in the activestore is the same as what is in code.
+//      if ($md5_activestore == $md5_datastore) {
+//        $status = CONFIGURATION_IN_SYNC;
+//        configuration_set_status($component, $identifier, $status);
+//        configuration_set_hash($component, $identifier, $md5_activestore);
+//      }
+//      if ($md5_activestore != $md5_datastore) {
+//        $status = $status | CONFIGURATION_DATASTORE_OVERRIDDEN;
+//        configuration_set_status($component, $identifier, $status);
+//      }
+//      // When checking for new configurations, check to see if configurations are
+//      // the same in datastore as last activestore. Remove the datastore overridden.
+//      if ($md5_datastore == $config[$component][$identifier]['hash']) {
+//        $status = $status & ~CONFIGURATION_DATASTORE_OVERRIDDEN;
+//        configuration_set_status($component, $identifier, $status);
+//      }
+//
+//      // Store the config array in cache for easy access
+//      if ($status != CONFIGURATION_IN_SYNC) {
+//        $configuration[$component][$identifier]['activestore'] = $variables_code[$identifier];
+//        $configuration[$component][$identifier]['datastore'] = (is_array($variables_code) && array_key_exists($identifier, $variables_code)) ? $variables_code[$identifier] : '';
+//        cache_set("$component:$identifier", $configuration, 'cache_configuration');
+//      }
+//    }
+//  }
+}
+
+function configuration_hash_configuration_modules($identifier) {
+//  // Export just the field we're tracking.
+//  
+//  module_load_include('inc', 'configuration', 'configuration.export');
+//
+//  $data = configuration_modules_configuration_export_options();
+//  
+//  // Export the field we just saved and evaluate the export to hash
+//  eval(array_pop(configuration_modules_configuration_export_render('configuration_modules', array($identifier))));
+//
+//  return md5(serialize($variables[$identifier]));
+}
