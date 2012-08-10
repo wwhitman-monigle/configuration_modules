@@ -1,6 +1,6 @@
 name = Configuration Modules Support  
 description = Provide hooks and methods for integrating installed/uninstalled modules with Configuration and provides hooks, etc...
-core = 7.x
+core = "7.x"
 package = Configuration
 dependencies[] = configuration
 files[] = configuration_modules.module
