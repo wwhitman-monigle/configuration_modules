@@ -54,19 +54,19 @@ function configuration_modules_configuration_export($data, &$export, $module_nam
  * Implements hook_configuration_export_render().
  */
 function configuration_modules_configuration_export_render($module_name, $data, $export = NULL) {
-  $installed_modules = array();
+  $enabled_modules = array();
   $code = array();
   
   $code[] = '  $modules = array();';
   $code[] = '';
   $module_list = module_list(TRUE, FALSE, TRUE);
   foreach ($module_list as $module) 
-    $installed_modules[$module] = 1;
+    $enabled_modules[$module] = 1;
       
-  $code[] = "  // Exported modules: installed";
+  $code[] = "  // Exported modules: enabled";
 
   //$code[] = "  \$modules['{$module}'] = 1;";
-  $code[] = "  \$modules['installed'] = " . configuration_var_export($installed_modules, '  ', FALSE) . ";";
+  $code[] = "  \$modules['enabled'] = " . configuration_var_export($enabled_modules, '  ', FALSE) . ";";
 
   $code[] = "";
   $code[] = '  return $modules;';
