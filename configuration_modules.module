@@ -193,3 +193,68 @@ function configuration_hash_configuration_modules($identifier) {
 
   return md5(serialize($modules[$identifier]));
 }
+
+
+/**
+ * Implements hook_module_enable()
+ * 
+ * @param array module_list
+ */
+function configuration_module_enable($module_list) {
+  
+  // Get them all -- Woody
+  foreach ($module_list as $module)
+  {
+    // Set a static variable that we can access across this request.
+
+    module_load_include('inc', 'configuration', "configuration.export");
+
+    // Set a static variable that we can access across this request.
+    $a = &drupal_static('configuration_from_activestore');
+    $a = true;
+    
+    configuration_check_configuration_modules($module);
+    
+    configuration_write_export_file();
+
+    //watchdog('configuration_variables', 'HOOK '. $name);
+
+    // @todo: Think about how I can handle this better.  Do I really want to
+    // rebuild cache everytime I make a change?
+    cache_clear_all('config_export', 'cache');
+    // Prime the cache.
+    $configs = configuration_get_configuration();
+  }
+}
+
+/**
+ * Implements hook_module_disable()
+ * 
+ * @param array module_list
+ */
+function configuration_module_disable($module_list) {
+  
+  // Get them all -- Woody
+  foreach ($module_list as $module)
+  {
+    // Set a static variable that we can access across this request.
+
+    module_load_include('inc', 'configuration', "configuration.export");
+
+    // Set a static variable that we can access across this request.
+    $a = &drupal_static('configuration_from_activestore');
+    $a = true;
+    
+    configuration_check_configuration_modules($module);
+    
+    configuration_write_export_file();
+
+    //watchdog('configuration_variables', 'HOOK '. $name);
+
+    // @todo: Think about how I can handle this better.  Do I really want to
+    // rebuild cache everytime I make a change?
+    cache_clear_all('config_export', 'cache');
+    // Prime the cache.
+    $configs = configuration_get_configuration();
+  }
+}
