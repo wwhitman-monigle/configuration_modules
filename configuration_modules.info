@@ -1,5 +1,5 @@
 name = Configuration Modules Support  
-description = Provide hooks and methods for integrating installed/uninstalled modules with Configuration and provides hooks, etc...
+description = Monigle Associates Package - Provide hooks and methods for integrating installed/uninstalled modules with Configuration and provides hooks, etc...
 core = "7.x"
 package = Configuration
 dependencies[] = configuration
